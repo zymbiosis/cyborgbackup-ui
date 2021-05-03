@@ -92,7 +92,8 @@ export class CatalogComponent implements OnInit, OnDestroy {
         const archiveNamesSplit = d.archive_name.split('-');
         const archiveType = archiveNamesSplit[0];
         const archiveHost = archiveNamesSplit[1];
-        const archiveDate = archiveNamesSplit[2] + '-' + archiveNamesSplit[3] + '-' + archiveNamesSplit[4] + '-' + archiveNamesSplit[5];
+        const archiveRepo = archiveNamesSplit[2];
+        const archiveDate = archiveNamesSplit.slice(3).join('-');// + '-' + archiveNamesSplit[3] + '-' + archiveNamesSplit[4] + '-' + archiveNamesSplit[5];
         let found = false;
         let entry = null;
         for (const v of this.data) {
@@ -115,6 +116,18 @@ export class CatalogComponent implements OnInit, OnDestroy {
         if (!found) {
           const tmpEntry = entry;
           entry = { data: {name: archiveHost, type: 'client'}, children: [] };
+          tmpEntry.children.push(entry);
+        }
+        found = false;
+        for (const v of entry.children) {
+          if ( v.data.name === archiveRepo && v.data.type === 'repository') {
+            found = true;
+            entry = v;
+          }
+        }
+        if (!found) {
+          const tmpEntry = entry;
+          entry = { data: {name: archiveRepo, type: 'repository'}, children: [] };
           tmpEntry.children.push(entry);
         }
         found = false;
